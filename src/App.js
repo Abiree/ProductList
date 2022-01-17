@@ -6,6 +6,9 @@ function App() {
   const Styles = styled.div`
   padding: 1rem;
 
+  .dropdown{
+    margin: 10px 0px;
+  }
   .pagination{
     background:rgb(0, 166, 237);
     align-items: center;
@@ -20,6 +23,8 @@ function App() {
     background:black;
     color:white;
   }
+
+  
   
 select{
   margin-left:10px;
@@ -41,7 +46,7 @@ select{
   table {
     border-spacing: 0;
     border: 1px solid black;
-   
+   width:100%;
     
     tr {
       :nth-child(1){

@@ -1,7 +1,8 @@
 
-import { useState, useEffect } from "react";
-import { useTable, usePagination, useSortBy} from "react-table";
-import { fetchProducts } from "./fetchData";
+import { useState, useEffect,useMemo } from "react";
+import { useTable, usePagination, useSortBy, useFilters } from "react-table";
+import { fetchProducts,fetchProductsCategory } from "./fetchData";
+import Select from "react-select";
 
 import React from "react";
 
@@ -9,21 +10,26 @@ export const Table = ()=> {
   
    
   const [data, setdata] = useState([]);
+  const [categories, setcategories] = useState([]);
+  const [filterValue, setFilter] = useState([]);
+  const [cat, setcat] = useState("all");
  
 
 
 useEffect(() => {
   fetchProducts(setdata);
+  fetchProductsCategory(setcategories);
 
 }, [])
+function onFilteredChangeCustom (value, accessor) {
+    setFilter({ id: accessor, value: value });
 
-function multiSelectFilter(rows, columnIds, filterValue) {
-  return filterValue.length === 0
-    ? rows
-    : rows.filter((row) =>
-        filterValue.includes(String(row.original[columnIds])),
-      );
-}
+};
+
+
+
+
+
 
     
     
@@ -54,8 +60,14 @@ function multiSelectFilter(rows, columnIds, filterValue) {
               {
                 Header: "category",
                 accessor: "category",
-                filter: multiSelectFilter,
-                show: false,
+                Filter: onFilteredChangeCustom,
+                filter: 'includes',
+             
+               
+              
+               
+              
+            
                 
               },
               {
@@ -111,50 +123,80 @@ function multiSelectFilter(rows, columnIds, filterValue) {
         setPageSize,
         state: { pageIndex, pageSize },
         
+         
+        
       } = useTable(
         {
           columns,
           data,
           initialState: { pageIndex: 0,pageSize:5 },
          
+        
+         
+         
         },
+        useFilters,
         useSortBy, 
         usePagination,
+       
+        
+      
       
       )
  // Render the UI for product table
  return (
   <>
-   
+  
+  <div className="dropdown">
+   <Select
+          style={{ width: "50%", margin: "20px" }}
+          onChange={entry => {
+            setcat(entry);
+            onFilteredChangeCustom(entry.value,
+              "category"
+            );
+          }}
+          value={cat}
+         
+          options={categories.map((o, i) => {
+            return { id: i, value: o, label: o };
+          })}
+        />
+        </div>
     <table {...getTableProps()}>
     
       <thead >
         {headerGroups.map(headerGroup => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map(column => (
+              console.log(column),
               <th {...column.getHeaderProps(column.getSortByToggleProps())}>{column.render('Header')}
-              <span>
+                        
+               <span>
                     {column.isSorted
                       ? column.isSortedDesc
                         ? ' 🔽'
                         : ' 🔼'
                       : ''}
-                  </span>
+                  </span> 
               </th>
             ))}
           </tr>
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
+       
         {page.map((row, i) => {
           prepareRow(row)
+         console.log(row.original.category)
           return (
+            row.original.category==filterValue.value||filterValue.value==null?
             <tr {...row.getRowProps()}>
               {row.cells.map(cell => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                 
               })}
-            </tr>
+            </tr>:null
           )
         
         }

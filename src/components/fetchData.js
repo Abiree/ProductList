@@ -18,6 +18,7 @@ export const fetchProductsCategory = (callback) => {
        
         console.log(response.data)
         callback(response.data)
+        console.log(response.data)
       })
       .catch(function (error) {
         alert(error);
